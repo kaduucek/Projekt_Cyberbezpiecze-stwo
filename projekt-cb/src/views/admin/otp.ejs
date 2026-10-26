@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<div class="card narrow">
+  <h1>Hasło jednorazowe</h1>
+  <p>
+    <%= info.action === 'created' ? 'Utworzono konto' : 'Zresetowano hasło konta' %>
+    <strong><%= info.login %></strong>. Przekaż użytkownikowi hasło jednorazowe:
+  </p>
+
+  <div class="otp-box" id="otp"><%= info.otp %></div>
+  <button type="button" class="btn btn-secondary" id="copy-btn">📋 Kopiuj</button>
+
+  <p class="alert info">Ważne do <strong><%= formatDate(info.expiresAt) %></strong> (4 godziny).
+    Przy pierwszym logowaniu użytkownik musi je zmienić.</p>
+  <p class="alert error">Hasło wyświetla się tylko raz. W bazie zapisany jest wyłącznie jego hash,
+    więc po opuszczeniu tej strony nie da się go odczytać.</p>
+
+  <a href="/admin/users" class="btn">Wróć do listy użytkowników</a>
+</div>
+
+<script>
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(document.getElementById('otp').textContent.trim());
+    document.getElementById('copy-btn').textContent = '✔ Skopiowano';
+  });
+</script>
+<%- include('../partials/footer') %>

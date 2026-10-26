@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<div class="card">
+  <p><a href="/articles">← Wszystkie dokumenty</a></p>
+  <h1><%= a.title %></h1>
+  <p class="muted small">
+    Autor: <%= a.author_name || a.author_login || '(konto usunięte)' %> ·
+    <% if (a.status === 'published') { %><span class="badge green">opublikowany</span>
+    <% } else { %><span class="badge yellow">szkic</span><% } %> ·
+    ostatnia zmiana: <%= formatDate(a.updated_at) %>
+  </p>
+
+  <div class="article-content"><%= a.content %></div>
+
+  <div class="actions article-actions">
+    <%- include('_actions', { a }) %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

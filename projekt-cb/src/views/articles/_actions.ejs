@@ -1,0 +1,14 @@
+<% if (a.editable) { %><a href="/articles/<%= a.id %>/edit">Edytuj</a><% } %>
+<% if (can('articles.publish')) { %>
+  <form method="post" action="/articles/<%= a.id %>/publish" class="inline">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button type="submit" class="btn-link"><%= a.status === 'published' ? 'Cofnij publikację' : 'Publikuj' %></button>
+  </form>
+<% } %>
+<% if (can('articles.delete')) { %>
+  <form method="post" action="/articles/<%= a.id %>/delete" class="inline"
+        onsubmit="return confirm('Usunąć ten dokument? Tej operacji nie można cofnąć.')">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button type="submit" class="btn-link danger">Usuń</button>
+  </form>
+<% } %>

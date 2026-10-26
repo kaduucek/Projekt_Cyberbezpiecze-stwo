@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<div class="card">
+  <h1>Dziennik zdarzeń</h1>
+  <p class="muted">Ostatnie 200 zdarzeń. Widoczny dla ról z uprawnieniem <code>reports.view</code>.</p>
+
+  <div class="table-wrap">
+  <table>
+    <tr><th>Data</th><th>Użytkownik</th><th>Zdarzenie</th><th>Szczegóły</th><th>IP</th></tr>
+    <% entries.forEach((e) => { %>
+      <tr>
+        <td class="small nowrap"><%= formatDate(e.created_at) %></td>
+        <td><%= e.login || '—' %></td>
+        <td><span class="badge <%= e.color %>"><%= e.event %></span></td>
+        <td class="small"><%= e.details || '' %></td>
+        <td class="small"><%= e.ip %></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<div class="card narrow">
+  <h1>Ustawienia bezpieczeństwa</h1>
+
+  <% if (errors.length > 0) { %>
+    <div class="alert error"><ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+
+  <form method="post" action="/admin/settings">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="checkbox">
+      <input type="checkbox" name="password_policy_enabled" <%= values.password_policy_enabled ? 'checked' : '' %>>
+      Włącz politykę haseł z wariantu 7
+    </label>
+    <small class="muted">Minimum 14 znaków i różnica co najmniej 4 znaków względem starego hasła
+      (odległość Levenshteina). Gdy wyłączona, obowiązuje tylko minimum NIST (8 znaków),
+      lista haseł zakazanych i historia haseł.</small>
+
+    <label for="password_expiry_days">Ważność hasła (dni)</label>
+    <input type="number" id="password_expiry_days" name="password_expiry_days"
+           min="0" max="365" value="<%= values.password_expiry_days %>" required>
+    <small class="muted">0 = hasło nie wygasa. NIST SP 800-63B nie zaleca okresowej zmiany haseł.</small>
+
+    <label for="session_idle_minutes">Wylogowanie po bezczynności (minuty)</label>
+    <input type="number" id="session_idle_minutes" name="session_idle_minutes"
+           min="1" max="240" value="<%= values.session_idle_minutes %>" required>
+
+    <label for="password_history_count">Ile poprzednich haseł pamiętać</label>
+    <input type="number" id="password_history_count" name="password_history_count"
+           min="1" max="24" value="<%= values.password_history_count %>" required>
+
+    <button type="submit" class="btn">Zapisz ustawienia</button>
+  </form>
+</div>
+<%- include('../partials/footer') %>

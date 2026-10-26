@@ -1,0 +1,65 @@
+<%- include('../partials/header') %>
+<div class="card">
+  <div class="card-head">
+    <h1>Użytkownicy</h1>
+    <a href="/admin/users/new" class="btn">+ Dodaj użytkownika</a>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <tr>
+      <th>Login</th><th>Imię i nazwisko</th><th>Rola</th><th>Status</th><th>Hasło</th><th>Akcje</th>
+    </tr>
+    <% users.forEach((u) => { %>
+      <tr>
+        <td>
+          <strong><%= u.login %></strong>
+          <% if (u.is_protected) { %><span class="badge">konto stałe</span><% } %>
+        </td>
+        <td><%= u.full_name %></td>
+        <td><%= u.role_names || '—' %></td>
+        <td>
+          <% if (u.is_blocked) { %><span class="badge red">zablokowane</span>
+          <% } else { %><span class="badge green">aktywne</span><% } %>
+          <% if (u.totp_enabled) { %><span class="badge">2FA</span><% } %>
+        </td>
+        <td class="small">
+          <% if (u.password_is_otp) { %>
+            <% if (u.otp_expires_at < now) { %>
+              <span class="badge red">jednorazowe – wygasło</span>
+            <% } else { %>
+              <span class="badge yellow">jednorazowe do <%= formatDate(u.otp_expires_at) %></span>
+            <% } %>
+          <% } else { %>
+            zmienione: <%= formatDate(u.password_changed_at) %>
+            <% if (expiryDays > 0) { %>
+              <br>wygasa: <%= formatDate(u.password_changed_at + expiryDays * 86400000) %>
+            <% } %>
+            <% if (u.must_change_password) { %><br><span class="badge yellow">wymuszona zmiana</span><% } %>
+          <% } %>
+        </td>
+        <td class="actions">
+          <a href="/admin/users/<%= u.id %>/edit">Edytuj</a>
+          <% if (!u.is_protected) { %>
+            <form method="post" action="/admin/users/<%= u.id %>/reset-password" class="inline"
+                  onsubmit="return confirm('Wygenerować nowe hasło jednorazowe dla <%= u.login %>?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn-link">Reset hasła</button>
+            </form>
+            <form method="post" action="/admin/users/<%= u.id %>/block" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn-link"><%= u.is_blocked ? 'Odblokuj' : 'Zablokuj' %></button>
+            </form>
+            <form method="post" action="/admin/users/<%= u.id %>/delete" class="inline"
+                  onsubmit="return confirm('Na pewno usunąć konto <%= u.login %>? Tej operacji nie można cofnąć.')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn-link danger">Usuń</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

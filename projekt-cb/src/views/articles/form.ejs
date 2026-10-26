@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<div class="card">
+  <h1><%= title %></h1>
+
+  <% if (errors.length > 0) { %>
+    <div class="alert error"><ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+
+  <form method="post" action="<%= mode === 'new' ? '/articles/new' : '/articles/' + articleId + '/edit' %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="title">Tytuł</label>
+    <input type="text" id="title" name="title" value="<%= values.title %>" required maxlength="200">
+
+    <label for="content">Treść</label>
+    <textarea id="content" name="content" rows="12" required maxlength="20000"><%= values.content %></textarea>
+
+    <% if (mode === 'new') { %>
+      <p class="muted small">Nowy dokument zapisuje się jako szkic. Opublikować go może Redaktor, Kierownik lub Administrator.</p>
+    <% } %>
+
+    <button type="submit" class="btn">Zapisz</button>
+    <a href="<%= mode === 'new' ? '/articles' : '/articles/' + articleId %>" class="btn btn-secondary">Anuluj</a>
+  </form>
+</div>
+<%- include('../partials/footer') %>

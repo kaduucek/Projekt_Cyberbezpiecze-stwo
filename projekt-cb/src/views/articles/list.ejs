@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+<div class="card">
+  <div class="card-head">
+    <h1>Dokumenty</h1>
+    <% if (can('articles.create')) { %><a href="/articles/new" class="btn">+ Nowy szkic</a><% } %>
+  </div>
+
+  <% if (articles.length === 0) { %>
+    <p class="muted">Brak dokumentów do wyświetlenia.</p>
+  <% } else { %>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Tytuł</th><th>Autor</th><th>Status</th><th>Ostatnia zmiana</th><th>Akcje</th></tr>
+      <% articles.forEach((a) => { %>
+        <tr>
+          <td><a href="/articles/<%= a.id %>"><%= a.title %></a></td>
+          <td><%= a.author_login || '(konto usunięte)' %></td>
+          <td>
+            <% if (a.status === 'published') { %><span class="badge green">opublikowany</span>
+            <% } else { %><span class="badge yellow">szkic</span><% } %>
+          </td>
+          <td class="small nowrap"><%= formatDate(a.updated_at) %></td>
+          <td class="actions">
+            <a href="/articles/<%= a.id %>">Otwórz</a>
+            <%- include('_actions', { a }) %>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+    </div>
+  <% } %>
+
+  <p class="muted small">
+    Widzisz opublikowane dokumenty<%= can('articles.edit_any') ? ' oraz wszystkie szkice' : (can('articles.create') ? ' oraz własne szkice' : '') %>.
+  </p>
+</div>
+<%- include('../partials/footer') %>

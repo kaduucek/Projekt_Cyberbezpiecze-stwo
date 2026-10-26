@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+<div class="card">
+  <h1>Witaj, <%= currentUser.full_name || currentUser.login %>!</h1>
+  <p>Zalogowano jako <strong><%= currentUser.login %></strong>,
+     rola: <strong><%= currentUser.roles.join(', ') %></strong>.</p>
+  <p class="muted small">
+    Hasło zmienione: <%= formatDate(currentUser.password_changed_at) %>
+    <% if (passwordExpiresAt) { %> · wygasa: <%= formatDate(passwordExpiresAt) %><% } %>
+  </p>
+  <% if (can('articles.read')) { %><a href="/articles" class="btn">📄 Przejdź do dokumentów</a><% } %>
+</div>
+
+<div class="card">
+  <h2>Twoje uprawnienia</h2>
+  <p class="muted">Uprawnienia wynikają z przypisanej roli (RBAC).</p>
+  <table>
+    <tr><th>Kod uprawnienia</th><th>Opis</th></tr>
+    <% permissionDetails.forEach((p) => { %>
+      <tr><td><code><%= p.code %></code></td><td><%= p.description %></td></tr>
+    <% }) %>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Macierz uprawnień (RBAC)</h2>
+  <p class="muted">Uprawnienia przypisane są do ról, a role do użytkowników. Twoja rola jest wyróżniona.</p>
+  <div class="table-wrap">
+  <table class="matrix">
+    <tr>
+      <th>Uprawnienie</th>
+      <% matrix.roles.forEach((r) => { %>
+        <th class="<%= currentUser.roles.includes(r.name) ? 'mine' : '' %>"><%= r.name %></th>
+      <% }) %>
+    </tr>
+    <% matrix.permissions.forEach((p) => { %>
+      <tr>
+        <td><code><%= p.code %></code><br><span class="small muted"><%= p.description %></span></td>
+        <% matrix.roles.forEach((r) => { %>
+          <td class="<%= currentUser.roles.includes(r.name) ? 'mine' : '' %>">
+            <%= matrix.has(r.id, p.id) ? '✔' : '' %>
+          </td>
+        <% }) %>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+</div>
+<%- include('partials/footer') %>

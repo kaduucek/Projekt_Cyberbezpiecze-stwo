@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+<div class="card narrow">
+  <h1><%= title %></h1>
+
+  <% if (errors.length > 0) { %>
+    <div class="alert error"><ul><% errors.forEach((e) => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>
+
+  <form method="post" action="<%= mode === 'new' ? '/admin/users/new' : '/admin/users/' + userId + '/edit' %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="login">Login</label>
+    <% if (mode === 'new') { %>
+      <input type="text" id="login" name="login" value="<%= values.login %>" required maxlength="32">
+      <small class="muted">3–32 znaki: litery a–z, cyfry, kropka, myślnik, podkreślenie.</small>
+    <% } else { %>
+      <input type="text" id="login" value="<%= values.login %>" disabled>
+    <% } %>
+
+    <label for="full_name">Imię i nazwisko</label>
+    <input type="text" id="full_name" name="full_name" value="<%= values.full_name %>" required maxlength="100">
+
+    <label for="role_id">Rola</label>
+    <select id="role_id" name="role_id" required <%= isProtected ? 'disabled' : '' %>>
+      <option value="">— wybierz —</option>
+      <% roles.forEach((r) => { %>
+        <option value="<%= r.id %>" <%= Number(values.role_id) === r.id ? 'selected' : '' %>>
+          <%= r.name %> – <%= r.description %>
+        </option>
+      <% }) %>
+    </select>
+    <% if (isProtected) { %><small class="muted">Roli konta ADMIN nie można zmienić.</small><% } %>
+
+    <% if (mode === 'edit') { %>
+      <label class="checkbox">
+        <input type="checkbox" name="must_change_password" <%= values.must_change_password ? 'checked' : '' %>>
+        Wymuś zmianę hasła przy następnym logowaniu
+      </label>
+    <% } else { %>
+      <p class="alert info">Po zapisaniu system wygeneruje hasło jednorazowe (16 znaków, ważne 4 godziny).
+        Użytkownik będzie musiał je zmienić przy pierwszym logowaniu.</p>
+    <% } %>
+
+    <button type="submit" class="btn">Zapisz</button>
+    <a href="/admin/users" class="btn btn-secondary">Anuluj</a>
+  </form>
+</div>
+<%- include('../partials/footer') %>

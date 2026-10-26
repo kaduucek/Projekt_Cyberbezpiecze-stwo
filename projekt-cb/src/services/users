@@ -1,0 +1,48 @@
+// Zapytania o użytkowników oraz ich role i uprawnienia (RBAC)
+const { db } = require('../db/database');
+
+function findUserByLogin(login) {
+  return db.prepare('SELECT * FROM users WHERE login = ?').get(login);
+}
+
+function findUserById(id) {
+  return db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+}
+
+// Nazwy ról użytkownika, np. ['Redaktor']
+function getUserRoles(userId) {
+  return db.prepare(`
+    SELECT r.name FROM roles r
+    JOIN user_roles ur ON ur.role_id = r.id
+    WHERE ur.user_id = ?
+  `).all(userId).map((r) => r.name);
+}
+
+// Kody uprawnień użytkownika: użytkownik -> role -> uprawnienia
+function getUserPermissions(userId) {
+  return db.prepare(`
+    SELECT DISTINCT p.code FROM permissions p
+    JOIN role_permissions rp ON rp.permission_id = p.id
+    JOIN user_roles ur ON ur.role_id = rp.role_id
+    WHERE ur.user_id = ?
+  `).all(userId).map((p) => p.code);
+}
+
+// To samo, ale z opisami (do wyświetlenia na stronie)
+function getUserPermissionDetails(userId) {
+  return db.prepare(`
+    SELECT DISTINCT p.code, p.description, p.id FROM permissions p
+    JOIN role_permissions rp ON rp.permission_id = p.id
+    JOIN user_roles ur ON ur.role_id = rp.role_id
+    WHERE ur.user_id = ?
+    ORDER BY p.id
+  `).all(userId);
+}
+
+module.exports = {
+  findUserByLogin,
+  findUserById,
+  getUserRoles,
+  getUserPermissions,
+  getUserPermissionDetails,
+};
